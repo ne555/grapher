@@ -1,0 +1,87 @@
+\documentclass[a4paper]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\title{Bresenham for paraboles}
+\author{Bedrij Aldo}
+\date{}
+
+\begin{document}
+	\maketitle
+
+	\begin{abstract}
+		Derivating equations for the rasterization of a parabola
+		using only integers
+	\end{abstract}
+
+	Without loose of generality, a quadratic curve can be represented as 
+	\[ y - a x^2 = 0 \]
+	That is, a parabola with vertex in $(0;0)$
+
+	We got a point $P = (\Delta x; \Delta y)$ for which the curve must go trough.
+	Let's assume that its coordinates are integers.
+
+	We are going to divide the procedure acording to wich variable has de higher delta
+
+	Considering $a>0$ and the part with $ 0 \leq y' $, the other gets for
+	reflextion
+
+	\section{ $ 0 \leq y' \leq 1 $ } 
+		In this case every pixel will increase its $x$ coordinate
+
+		At each step we test if the mid-point of the pixel lies below or above the curve.
+		If it lies below, we paint the $N$ pixel.
+
+		Using the discriminant 
+		\[ D = y - a x^2 \]
+
+		So if $D>0$ the midpoint is above the curve.
+
+		So we test the midpoint
+		\[ D = (y_j+0.5) - \frac{\Delta y}{\Delta x^2} (x_j+1)^2\]
+
+
+		In order to avoid the rationals number we multiply all by $2 \Delta x^2$
+		\[ D = -2 \Delta y (x_j+1)^2 + \Delta x^2 (2 y_j+1) \]
+
+		As we start in the vertex $(0;0)$ we've got
+		\[ D_0 = -2 \Delta y + \Delta x^2 \]
+
+		We could test this for each x that we encounter, but taking into account the increment
+
+		\[ \Delta D = \left\{
+			\begin{array}{ll}
+				\mbox{South: } & -2\Delta y (2x_j + 3) \\
+				\mbox{North: } & -2\Delta y (2x_j + 3) + 2 \Delta x^2 \\
+			\end{array}
+			\right.
+		\]
+
+		\subsection{Incrementing the incrementals}
+
+	\section{ $1<y'$ }
+		In this case every pixel will increase its $y$ coordinate.
+		We need to analize if we paint the $E$ or $W$ pixel.
+
+		The discriminant
+		\[D = (y_j+1) - \frac{\Delta y}{\Delta x^2} (x+0.5)^2 \]
+
+		In order to avoid the rationals number we multiply all by $4 \Delta x^2$
+		\[ D = 4\Delta x^2 (y_j+1) -\Delta y (2x_j+1)^2 \]
+
+		The increments
+		\[ \Delta D = \left\{
+			\begin{array}{ll}
+				\mbox{East: } & 4 \Delta x^2 - 8 \Delta y (x_j + 1) \\
+				\mbox{West: } & 4 \Delta x^2
+			\end{array}
+			\right.
+		\]
+
+		\subsection{Incrementing the incrementals}
+			We only need to actualize in the $EE$ case
+			\[EE = EE - 8\Delta y\]
+
+\end{document}
+
