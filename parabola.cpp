@@ -150,16 +150,19 @@ namespace bresenham{
 		int 
 			dx2 = square(end[0]),
 			dy = end[1],
-			discriminant = 4*dx2*(begin[1]+1) - dy*square(2*begin[0]+1);
+			discriminant = 4*dx2*(begin[1]+1) - dy*square(2*begin[0]+1),
+			east = 4*dx2 - 8*dy*(begin[0]+1),
+			west = 4*dx2;
 
 		for(size_t x=begin[0], y=begin[1]; y<=end[1]; ++y){
 			glVertex2i(x,y);
 			if(discriminant>0){ //east (increase x)
-				discriminant += 4*dx2 - 8*dy*(x+1);
+				discriminant += east;
+				east += -8*dy;
 				++x;
 			}
 			else{
-				discriminant += 4*dx2;
+				discriminant += west;
 			}
 
 		}
