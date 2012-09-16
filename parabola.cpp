@@ -128,18 +128,23 @@ namespace bresenham{
 		int 
 			dx2 = end[0]*end[0],
 			dy = end[1],
-			discriminant = -2*dy + dx2;
+			discriminant = -2*dy + dx2,
+			south = -6*dy,
+			north = -6*dy + 2*dx2,
+			increment = -4*dy;
 
 		for(size_t x=0, y=0; x<=end[0]/2; ++x){
 			glVertex2i(x,y);
 			if(discriminant>0){ //south (same y)
-				discriminant += -2*dy*(2*x+3);
+				discriminant += south;
 			}
 			else{
-				discriminant += -2*dy*(2*x+3) + 2*dx2;
+				discriminant += north;
 				++y;
 			}
 
+			south += increment;
+			north += increment;
 		}
 	}
 }
