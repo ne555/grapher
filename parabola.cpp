@@ -122,20 +122,16 @@ void Display_cb(){
 }
 
 namespace bresenham{
-	void parabola(const point2d &end){
-		//y-ax^2 = 0
-		//a > 0
-
-		//0 <= y' <= 1
+	void travel_x(const point2d &end){
 		int 
-			dx2 = end[0]*end[0],
+			dx2 = square(end[0]),
 			dy = end[1],
 			discriminant = -2*dy + dx2,
 			south = -6*dy,
 			north = -6*dy + 2*dx2,
 			increment = -4*dy;
 
-		for(size_t x=0, y=0; x<=end[0]/2; ++x){
+		for(size_t x=0, y=0; x<=end[0]; ++x){
 			glVertex2i(x,y);
 			if(discriminant>0){ //south (same y)
 				discriminant += south;
@@ -148,6 +144,44 @@ namespace bresenham{
 			south += increment;
 			north += increment;
 		}
+	}
+
+	void travel_y(const point2d &begin, const point2d &end){
+		int 
+			dx2 = square(end[0]),
+			dy = end[1],
+			discriminant = 4*dx2*(begin[1]+1) - dy*square(2*begin[0]+1);
+
+		for(size_t x=begin[0], y=begin[1]; y<=end[1]; ++y){
+			glVertex2i(x,y);
+			if(discriminant>0){ //east (increase x)
+				discriminant += 4*dx2 - 8*dy*(x+1);
+				++x;
+			}
+			else{
+				discriminant += 4*dx2;
+			}
+
+		}
+	}
+
+	void parabola(const point2d &end){
+		//y-ax^2 = 0
+		//a > 0
+		int 
+			dx2 = square(end[0]),
+			dy = end[1];
+		point2d change(2);
+		change[0] = dx2 / (2*dy);
+		change[1] = square(change[0])*dy/dx2;
+
+		//0 <= y' <= 1
+		travel_x(change);
+		//1 < y'
+		travel_y(change, end);
+
+		glColor3fv(red);
+		glVertex2i(change[0], change[1]);
 	}
 }
 
