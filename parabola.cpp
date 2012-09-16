@@ -29,10 +29,15 @@ T norm1(const std::valarray<T> &v){
 	return v.max();
 }
 
+namespace bresenham{
+	typedef std::valarray<int> point2d;
+	void parabola(const point2d &end);
+}
 namespace recursive{
 	typedef std::valarray<double> point2d;
 	void parabola(double a, const point2d &begin, const point2d &end);
 }
+
 int main(int argc, char **argv){
 	glutInit(&argc,argv);// inicializa glut
 	initialize(); // condiciones iniciales de la ventana y OpenGL
@@ -80,20 +85,21 @@ void Motion_cb(int x, int y){
 }
 
 void Reshape_cb(int width, int height){
-	//  cout << "reshape " << width << "x" << height << endl;
 	if (!width||!height) return; // minimizado ==> nada
 	w=width; h=height;
 	glViewport(0,0,w,h); // región donde se dibuja (toda la ventana)
 	// rehace la matriz de proyección (la porcion de espacio visible)
-	glMatrixMode(GL_PROJECTION);  glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	glOrtho(0,w,0,h,-1,1);
 	glMatrixMode(GL_MODELVIEW);
-	Display_cb(); // Redibuja mientras hace el reshape
+	glutPostRedisplay();
 }
 
 void Display_cb(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glPointSize(5);
 	glColor3fv(red);
 	glBegin(GL_POINTS);{
 		std::valarray<double> begin(2),end(2);
@@ -101,7 +107,41 @@ void Display_cb(){
 		recursive::parabola(end[1]/square(end[0]),begin,end);
 	}glEnd();
 
+	glPointSize(1);
+	glColor3fv(green);
+	glBegin(GL_POINTS);{
+		std::valarray<int> end(2);
+		end[0] = w; end[1] = h;
+		bresenham::parabola(end);
+	}glEnd();
+
+
 	glutSwapBuffers();
+}
+
+namespace bresenham{
+	void parabola(const point2d &end){
+		//y-ax^2 = 0
+		//a > 0
+
+		//0 <= y' <= 1
+		int 
+			dx2 = end[0]*end[0],
+			dy = end[1],
+			discriminant = -2*dy + dx2;
+
+		for(size_t x=0, y=0; x<=end[0]/2; ++x){
+			glVertex2i(x,y);
+			if(discriminant>0){ //south (same y)
+				discriminant += -2*dy*(2*x+3);
+			}
+			else{
+				discriminant += -2*dy*(2*x+3) + 2*dx2;
+				++y;
+			}
+
+		}
+	}
 }
 
 namespace recursive{
