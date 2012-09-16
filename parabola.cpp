@@ -8,6 +8,8 @@
 using namespace std;
 
 int w,h;
+int pointsize=10;
+
 float
 	white[] = {1,1,1},
 	black[] = {0,0,0},
@@ -91,7 +93,7 @@ void Reshape_cb(int width, int height){
 	// rehace la matriz de proyección (la porcion de espacio visible)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0,w,0,h,-1,1);
+	glOrtho(0,w/pointsize,0,h/pointsize,-1,1);
 	glMatrixMode(GL_MODELVIEW);
 	glutPostRedisplay();
 }
@@ -99,20 +101,20 @@ void Reshape_cb(int width, int height){
 void Display_cb(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glPointSize(5);
-	glColor3fv(red);
-	glBegin(GL_POINTS);{
-		std::valarray<double> begin(2),end(2);
-		end[0] = w; end[1] = h;
-		recursive::parabola(end[1]/square(end[0]),begin,end);
-	}glEnd();
-
-	glPointSize(1);
+	glPointSize(pointsize);
 	glColor3fv(green);
 	glBegin(GL_POINTS);{
 		std::valarray<int> end(2);
-		end[0] = w; end[1] = h;
+		end[0] = w/pointsize; end[1] = h/pointsize;
 		bresenham::parabola(end);
+	}glEnd();
+
+	glPointSize(1);
+	glColor3fv(black);
+	glBegin(GL_POINTS);{
+		std::valarray<double> begin(2),end(2);
+		end[0] = w/pointsize; end[1] = h/pointsize;
+		recursive::parabola(end[1]/square(end[0]),begin,end);
 	}glEnd();
 
 
@@ -151,10 +153,10 @@ namespace bresenham{
 
 namespace recursive{
 	void parabola(double a, const point2d &begin, const point2d &end){
-		glVertex2i(begin[0], begin[1]);
+		glVertex2d(begin[0], begin[1]);
 
 		point2d delta = end-begin;
-		if(norm1(delta) <= 1) return;
+		if(norm1(delta) <= 1.0/pointsize) return;
 
 		point2d midpoint(2);
 		midpoint[0] = begin[0]+delta[0]/2;
