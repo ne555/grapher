@@ -1,5 +1,6 @@
 objects=parabola.o
-project=parabola
+project=parabola.bin
+CXXFLAGS+=-ggdb
 LIBRARIES=$(addprefix -l,GL GLU glut)
 
 $(project): $(objects)
