@@ -3,15 +3,36 @@
 	adjusting the vertex and a point to pass
 */
 #include <iostream>
+#include <valarray>
 #include <GL/glut.h>
 using namespace std;
 
 int w,h;
 float
-	fondo[] = {1,1,1};
+	white[] = {1,1,1},
+	black[] = {0,0,0},
+	blue[] = {0,0,1},
+	green[] = {0,1,0},
+	red[] = {1,0,0};
+
+float *fondo=white;
 
 void initialize();
 
+template<class T>
+T square(T x){
+	return x*x;
+}
+
+template<class T>
+T norm1(const std::valarray<T> &v){
+	return v.max();
+}
+
+namespace recursive{
+	typedef std::valarray<double> point2d;
+	void parabola(double a, const point2d &begin, const point2d &end);
+}
 int main(int argc, char **argv){
 	glutInit(&argc,argv);// inicializa glut
 	initialize(); // condiciones iniciales de la ventana y OpenGL
@@ -30,14 +51,14 @@ void initialize() {
 	glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE);
 	glutInitWindowSize(w,h);
 	glutCreateWindow("Parabola Bresenham"); // crea el main window
-	
+
 	//declara los callbacks
 	//los que no se usan no se declaran
 	glutDisplayFunc(Display_cb); // redisplays
 	glutReshapeFunc(Reshape_cb);
 	glutKeyboardFunc(Keyboard_cb);
 	//glutMouseFunc(Mouse_cb);
-	
+
 	// ========================
 	// estado normal del OpenGL
 	// ========================
@@ -71,5 +92,30 @@ void Reshape_cb(int width, int height){
 }
 
 void Display_cb(){
+	glClear(GL_COLOR_BUFFER_BIT);
 
+	glColor3fv(red);
+	glBegin(GL_POINTS);{
+		std::valarray<double> begin(2),end(2);
+		end[0] = w; end[1] = h;
+		recursive::parabola(end[1]/square(end[0]),begin,end);
+	}glEnd();
+
+	glutSwapBuffers();
+}
+
+namespace recursive{
+	void parabola(double a, const point2d &begin, const point2d &end){
+		glVertex2i(begin[0], begin[1]);
+
+		point2d delta = end-begin;
+		if(norm1(delta) <= 1) return;
+
+		point2d midpoint(2);
+		midpoint[0] = begin[0]+delta[0]/2;
+		midpoint[1] = a*square(midpoint[0]);
+
+		parabola(a, begin, midpoint);
+		parabola(a, midpoint, end);
+	}
 }
